@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from red_teaming.evaluation import Row, format_table, run_report
 from red_teaming.mutators import (
     MUTATOR_NAMES,
     REGISTRY,
@@ -30,11 +31,14 @@ __all__ = [
     "EvolutionarySearch",
     "Goal",
     "Mutator",
+    "Row",
     "SearchResult",
     "apply_mutators",
     "best_single_mutator",
     "direct_attack",
     "evaluate_attack",
+    "format_table",
     "get_mutator",
     "respond",
+    "run_report",
 ]
