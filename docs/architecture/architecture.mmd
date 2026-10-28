@@ -1,5 +1,5 @@
 ---
-title: System Architecture - Red Teaming
+title: System Architecture - Red Teaming Engine
 config:
   theme: base
   themeVariables:
@@ -14,25 +14,30 @@ config:
 flowchart LR
     classDef core     fill:#6366F1,stroke:#1E293B,color:#ffffff,stroke-width:1px;
     classDef data     fill:#10B981,stroke:#1E293B,color:#ffffff,stroke-width:1px;
-    classDef external fill:#F59E0B,stroke:#1E293B,color:#1E293B,stroke-width:1px;
     classDef danger   fill:#EF4444,stroke:#1E293B,color:#ffffff,stroke-width:1px;
 
-    User([User]):::external
+    Goals[(Goal suite)]:::data
+    Mutators[(Mutator registry)]:::data
 
-    subgraph Application["Application Service"]
-        API[API Layer]:::core
-        Core[Core Engine]:::core
-        Evaluation[Evaluation Harness]:::core
+    subgraph Search["Evolutionary search"]
+        Population[Population of attacks]:::core
+        Fitness[Fitness: evasion and comprehension]:::core
+        Variation[Crossover and mutation]:::core
     end
 
-    Cache[(Semantic Cache)]:::data
-    Store[(Datastore / Index)]:::data
-    LLM{{LLM Provider}}:::external
+    subgraph Target["System under test"]
+        Guard{{Guard: naive or hardened}}:::danger
+        Model[Model comprehension]:::core
+    end
 
-    User -->|request| API
-    API --> Core
-    Core -->|lookup| Cache
-    Core -->|retrieve| Store
-    Core -->|completion| LLM
-    Core -.->|traces/metrics| Evaluation
-    Core -->|response| User
+    Report[Attack success rate report]:::core
+
+    Goals --> Population
+    Mutators --> Variation
+    Population --> Fitness
+    Fitness -->|score each attack| Target
+    Guard -->|detection| Fitness
+    Model -->|comprehension| Fitness
+    Fitness --> Variation
+    Variation --> Population
+    Population -->|best attacks| Report

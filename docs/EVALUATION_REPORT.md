@@ -1,34 +1,32 @@
-# Evaluation Report - Red Teaming
+# Evaluation Report - Red Teaming Engine
 
-> Reproduce everything here with `make evaluation`. Report mean ± 95% confidence interval over N seeds.
+> Reproduce with `python -m red_teaming report`. Deterministic and offline.
 
 ## Setup
-- **Task / dataset:** name, size, split.
-- **Metrics:** definition of each metric and why it's the right one.
-- **Graders:** exact-match / model-graded (which model, prompt) / human.
-- **Baselines:** what you compare against.
-- **Seeds:** list. **Hardware:** e.g., 1×A100 80GB. **Cost:** $X. **Runtime:** Yh.
 
-## Headline results
+- **Goals:** five, over fictional restricted terms, with guard thresholds from 0.40 to 0.60.
+- **Metric:** attack success rate, the fraction of goals jailbroken.
+- **Strategies:** the direct control, the best single mutator, the evolutionary search, and
+  the evolutionary search against the hardened guard.
 
-| Metric | This project | Baseline | SOTA / ref | Δ vs baseline |
-|---|---:|---:|---:|---:|
-| Primary (↑) | **0.00 ± 0.00** | 0.00 | 0.00 | +0.00 |
-| Latency p95 (ms, ↓) | **0** | 0 | - | - |
-| Cost / 1k ($, ↓) | **0.00** | 0.00 | - | - |
+## Results
 
-## Ablations
+| Strategy | attack success rate |
+|---|---:|
+| direct (no attack) | 0.000 |
+| best single mutator | 0.400 |
+| evolutionary search | 1.000 |
+| evolutionary vs hardened guard (defense) | 0.000 |
 
-| Variant | Metric | Δ | Notes |
-|---|---:|---:|---|
-| Full | 0.00 | - | reference |
-| - component X | 0.00 | −0.00 | shows X matters |
+## Interpretation
 
-## LLM-as-judge validation (if used)
-- Agreement with human labels (Cohen's κ / accuracy), bias controls, sample size.
-
-## Error analysis
-- Top failure categories with counts and representative examples.
+Direct requests are always blocked (0.000). The strongest single mutator beats only the two
+laxest guards (0.400), because no single transform drops detection far enough for a strict
+guard without destroying comprehension. The evolutionary search composes mutators and
+jailbreaks all five goals (1.000). The hardened guard, which largely sees through obfuscation,
+drives the very same evolved attacks back to 0.000. Together these show both the attack and
+its defense, measured on held-out difficulty levels.
 
 ## Reproducibility
-- Exact command, configuration hash, dataset version, W&B/MLflow run URL.
+
+The search is seeded; every number regenerates exactly.
