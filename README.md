@@ -120,6 +120,13 @@ print(respond(goal, result.attack))
 - **Evolutionary search.** A genetic algorithm explores compositions efficiently and is
   deterministic under a fixed seed. ([ADR-0003](docs/adr/0003-evolutionary-search.md))
 
+## Performance
+
+A deterministic micro-benchmark (`uv run python benchmarks/benchmark.py`) runs the search
+over the goal suite across a range of population sizes, reporting search time and attack
+success rate. The search jailbreaks the full suite in a few milliseconds even at small
+populations, because fitness evaluation is a handful of arithmetic operations per attack.
+
 ## Responsible AI
 
 - **Model card:** [docs/MODEL_CARD.md](docs/MODEL_CARD.md)
