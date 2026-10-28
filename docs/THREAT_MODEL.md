@@ -1,21 +1,25 @@
-# Threat Model - Red Teaming
+# Threat Model - Red Teaming Engine
 
 ## Assets
-- What's worth protecting (data, keys, model, user trust, budget).
+
+- Integrity of the attack-success-rate measurements and the defense evaluation.
 
 ## Trust boundaries
-- Where untrusted input crosses into the system (reference the architecture diagram).
 
-## Threats (STRIDE + LLM-specific)
+- **Goals, mutators, and attacks are untrusted text.** They are transformed and scored, never
+  executed; there is no path from text to execution.
+
+## Threats and mitigations
 
 | Threat | Vector | Impact | Mitigation |
 |---|---|---|---|
-| Prompt injection | Untrusted content in context / tools | Data exfiltration, unsafe actions | Input/output filtering, tool allow-list, least privilege |
-| Jailbreak | Adversarial user prompt | Policy bypass | System-prompt hardening, output classifier, refusal evaluation |
-| Data exfiltration | Model echoes secrets / PII | Privacy breach | Secret scanning, output redaction, no secrets in context |
-| Excessive cost | Unbounded loops / large inputs | $ blowout | Token/step budgets, rate limits, timeouts |
-| Tool abuse | Agent calls dangerous tool | Destructive action | Approval gates, sandboxing, dry-run |
-| Supply chain | Malicious dependency | Code execution | Pinned dependencies, Dependabot, SBOM |
+| Producing real harmful content | Realistic restricted terms | Misuse | Restricted terms are fictional; success yields only a marker |
+| Irreproducible results | An unseeded search | Flaky measurements | Deterministic, seeded genetic algorithm |
+| Overstated attack success | Evaluating only lax guards | Misleading rates | The suite spans lax to strict guards and reports per strategy |
+| Supply-chain compromise | Malicious dependency | Code execution | Zero runtime dependencies; Dependabot and CodeQL in continuous integration |
 
 ## Residual risk
-- What remains after mitigations and why it's acceptable.
+
+The target is a simulation, so results do not transfer verbatim to a deployed guard. The
+project's value is the reproducible methodology: search for evasions, measure attack success
+rate, and verify that a hardened guard defeats the discovered attacks.
