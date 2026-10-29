@@ -8,36 +8,52 @@ config:
     primaryBorderColor: "#1E293B"
     primaryTextColor: "#1E293B"
     lineColor: "#64748B"
-    clusterBkg: "#E2E8F0"
+    clusterBkg: "#EEF2FF"
     clusterBorder: "#94A3B8"
 ---
-flowchart LR
+flowchart TB
+    classDef edge     fill:#F59E0B,stroke:#1E293B,color:#1E293B,stroke-width:1px;
     classDef core     fill:#6366F1,stroke:#1E293B,color:#ffffff,stroke-width:1px;
     classDef data     fill:#10B981,stroke:#1E293B,color:#ffffff,stroke-width:1px;
+    classDef control  fill:#0EA5E9,stroke:#1E293B,color:#ffffff,stroke-width:1px;
     classDef danger   fill:#EF4444,stroke:#1E293B,color:#ffffff,stroke-width:1px;
 
-    Goals[(Goal suite)]:::data
-    Mutators[(Mutator registry)]:::data
+    Client([Client]):::edge
 
-    subgraph Search["Evolutionary search"]
+    subgraph Edge["Service layer (stdlib HTTP, stateless)"]
+        direction TB
+        Router["Router<br/>/health | /report | /attack"]:::core
+        Validate["Request validation<br/>named goal, bounded seed"]:::control
+    end
+
+    Goals[(Goal suite<br/>fictional restricted terms)]:::data
+    Mutators[(Mutator registry<br/>evasion + comprehension profiles)]:::data
+
+    subgraph Search["Evolutionary search (seeded, deterministic)"]
+        direction TB
         Population[Population of attacks]:::core
-        Fitness[Fitness: evasion and comprehension]:::core
+        Fitness["Fitness<br/>evasion vs comprehension"]:::core
         Variation[Crossover and mutation]:::core
     end
 
     subgraph Target["System under test"]
+        direction TB
         Guard{{Guard: naive or hardened}}:::danger
         Model[Model comprehension]:::core
     end
 
     Report[Attack success rate report]:::core
 
+    Client -->|JSON request| Router --> Validate
+    Validate -->|goal| Population
     Goals --> Population
     Mutators --> Variation
     Population --> Fitness
-    Fitness -->|score each attack| Target
+    Fitness -->|score each attack| Guard
+    Fitness -->|score each attack| Model
     Guard -->|detection| Fitness
     Model -->|comprehension| Fitness
-    Fitness --> Variation
-    Variation --> Population
-    Population -->|best attacks| Report
+    Fitness --> Variation --> Population
+    Population -->|best attack| Router
+    Population -->|aggregate| Report --> Router
+    Router -->|JSON response| Client

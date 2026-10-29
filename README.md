@@ -120,12 +120,38 @@ print(respond(goal, result.attack))
 - **Evolutionary search.** A genetic algorithm explores compositions efficiently and is
   deterministic under a fixed seed. ([ADR-0003](docs/adr/0003-evolutionary-search.md))
 
-## Performance
+## Running the service
+
+A dependency-free HTTP service exposes the engine as a production-style JSON API:
+
+```bash
+python -m red_teaming serve --port 8000
+
+curl localhost:8000/health
+curl localhost:8000/report
+curl -s -X POST localhost:8000/attack -d '{"goal": "strict-guard"}'
+curl -s -X POST localhost:8000/attack -d '{"goal": "strict-guard", "hardened": true}'
+```
+
+`GET /report` returns the attack success rate per strategy; `POST /attack` evolves an
+attack for one goal (optionally against the hardened guard, the defense). Every restricted
+term is fictional and a success only returns a marker. See the
+[operations guide](docs/OPERATIONS.md) for the service contract and operational constraints.
+
+## Performance and reliability
 
 A deterministic micro-benchmark (`uv run python benchmarks/benchmark.py`) runs the search
 over the goal suite across a range of population sizes, reporting search time and attack
 success rate. The search jailbreaks the full suite in a few milliseconds even at small
 populations, because fitness evaluation is a handful of arithmetic operations per attack.
+
+A production-style stress benchmark (`uv run python benchmarks/stress.py`) drives the full
+attack handler under concurrent load and reports throughput with p50, p95, and p99 latency.
+It surfaces a real constraint: the pure-Python search is bound by the global interpreter
+lock, so throughput is flat across threads and the tail grows with concurrency; the service
+is scaled with processes, and searches cache cleanly because they are seeded. The scaling
+path and tradeoffs are in [docs/SCALING.md](docs/SCALING.md), and a full attack-and-defend
+walk-through is in the [case study](docs/CASE_STUDY.md).
 
 ## Responsible AI
 
