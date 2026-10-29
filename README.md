@@ -137,6 +137,7 @@ curl -s -X POST localhost:8000/attack -d '{"goal": "strict-guard", "hardened": t
 attack for one goal (optionally against the hardened guard, the defense). Every restricted
 term is fictional and a success only returns a marker. See the
 [operations guide](docs/OPERATIONS.md) for the service contract and operational constraints.
+The service also exposes `GET /ready` (readiness) and `GET /metrics` (per-route request, error, and latency metrics in Prometheus text format).
 
 ## Performance and reliability
 
@@ -175,5 +176,5 @@ walk-through is in the [case study](docs/CASE_STUDY.md).
 
 ## License
 
-[MIT](LICENSE). Part of a 28-project artificial intelligence engineering portfolio by
+[MIT](LICENSE). Part of an artificial intelligence engineering portfolio by
 [adeoluo](https://github.com/adeoluo).
