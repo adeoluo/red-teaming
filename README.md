@@ -27,7 +27,7 @@ real deployment would enforce. It is a tool for **strengthening** guardrails.
 
 A safety guardrail is only as good as the attacks it has been tested against. Red teaming
 searches for inputs that make a guarded system violate its policy, so the guard can be
-hardened against them. This project builds an automated red-teamer **from first principles**:
+hardened against them. This project builds an automated red-teamer **from scratch**:
 a guarded target, a library of evasion mutators, and an evolutionary search that discovers
 attacks, all offline, deterministic, and with **zero runtime dependencies**. It then closes
 the loop by showing a **hardened guard** that defeats the discovered attacks.
