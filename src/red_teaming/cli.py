@@ -29,6 +29,12 @@ def _cmd_attack(args: argparse.Namespace) -> None:
     print(f"response: {respond(goal, result.attack, hardened=args.hardened)}")
 
 
+def _cmd_serve(args: argparse.Namespace) -> None:
+    from red_teaming.service import serve
+
+    serve(host=args.host, port=args.port)
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(prog="red-teaming", description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
@@ -42,7 +48,11 @@ def main(argv: list[str] | None = None) -> None:
         "--hardened", action="store_true", help="attack the hardened guard (the defense)"
     )
 
-    handlers = {"report": _cmd_report, "attack": _cmd_attack}
+    serve = sub.add_parser("serve", help="start the HTTP red-teaming service")
+    serve.add_argument("--host", default="127.0.0.1", help="bind host")
+    serve.add_argument("--port", type=int, default=8000, help="bind port")
+
+    handlers = {"report": _cmd_report, "attack": _cmd_attack, "serve": _cmd_serve}
     args = parser.parse_args(argv)
     handlers[args.command](args)
 
