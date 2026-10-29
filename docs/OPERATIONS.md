@@ -21,6 +21,8 @@ A standard-library HTTP server with **zero runtime dependencies**.
 | Method | Path | Body | Success |
 |---|---|---|---|
 | GET | `/health` | none | `{"status": "ok", "goals": N}` |
+| GET | `/ready` | none | readiness of the engine |
+| GET | `/metrics` | none | per-route request, error, and latency metrics (Prometheus text) |
 | GET | `/report` | none | attack success rate per strategy |
 | POST | `/attack` | `{"goal", "seed"?, "hardened"?}` | evolved attack, success, response |
 
