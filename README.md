@@ -72,6 +72,28 @@ guards (0.400). The **evolutionary search jailbreaks all five** (1.000) by compo
 The **hardened guard**, which largely sees through obfuscation, drives the very same evolved
 attacks back to **0.000**, demonstrating the defense.
 
+### Scale
+
+To check that the search holds up beyond the five bundled goals, `benchmarks/scale.py`
+runs the evolutionary search over deterministically generated synthetic goals (fictional
+restricted tokens, varying guard thresholds) at growing sizes. Each goal is attacked
+twice - against the base guard (attack success rate) and the hardened guard (block rate) -
+while wall-clock time, throughput, and peak memory (via the standard-library
+`tracemalloc`) are recorded. The data is synthetic and the numbers are
+environment-specific; the search is compute-bound, so memory stays small and roughly flat
+while time scales with the number of attacks.
+
+| Goals | Wall-clock (s) | Throughput (goals/s) | Peak memory (MiB) | Attack rate | Block rate |
+|---:|---:|---:|---:|---:|---:|
+| 50 | 2.69 | ~19 | 0.12 | 1.000 | 1.000 |
+| 100 | 3.54 | ~28 | 0.23 | 1.000 | 1.000 |
+| 200 | 7.84 | ~26 | 0.34 | 1.000 | 1.000 |
+| 400 | 15.67 | ~26 | 0.15 | 1.000 | 1.000 |
+
+The attack success rate stays 1.000 and the hardened-guard block rate stays 1.000 across
+sizes, matching the five-goal suite: the search reliably jailbreaks the base guard and the
+defense reliably stops it. Reproduce with `uv run python benchmarks/scale.py`.
+
 ## Demonstration
 
 ```text
