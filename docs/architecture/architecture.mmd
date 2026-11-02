@@ -5,61 +5,48 @@ flowchart LR
     classDef control  fill:#0EA5E9,stroke:#1E293B,color:#ffffff,stroke-width:1px;
     classDef obs      fill:#CBD5E1,stroke:#1E293B,color:#1E293B,stroke-width:1px;
 
-    Client(["HTTP client"]):::edge
-    CLI(["CLI<br/>report | attack | serve"]):::edge
-
-    subgraph Interfaces["Interfaces (stdlib HTTP, stateless)"]
+    subgraph Interfaces["Interfaces"]
         direction TB
-        Router["Router<br/>/health | /ready | /report | /attack"]:::core
-        Validate["Request validation<br/>known goal, seed bound, hardened flag"]:::control
+        CLI["CLI<br/>report, attack, serve"]:::edge
+        Client(["HTTP client"]):::edge
+        Router["HTTP router<br/>/report /attack"]:::core
+        Validate["Validation<br/>goal, seed, hardened"]:::control
+        CLI ~~~ Client --> Router --> Validate
     end
 
-    subgraph Bundled["Bundled data (fictional, read-only)"]
+    subgraph Search["Attack search (seeded)"]
         direction TB
-        Goals[("Goal suite<br/>5 fictional terms, guard thresholds")]:::data
-        Mutators[("Mutator registry<br/>7 transforms, evasion + cost")]:::data
-    end
-
-    subgraph Search["Attack search (seeded, deterministic)"]
-        direction TB
-        Evo["Evolutionary search<br/>population 16, 20 generations"]:::core
-        Baselines["Baselines<br/>direct, best single mutator"]:::core
-        Fitness["Fitness ranking<br/>success bonus, else threshold deficits"]:::core
+        Baselines["Baselines<br/>direct, single mutator"]:::core
+        Evo["Evolutionary search<br/>16 attacks, 20 gens"]:::core
+        Fitness["Fitness ranking<br/>success, else deficits"]:::core
         Variation["Crossover + mutation<br/>insert, delete, replace"]:::core
+        Baselines ~~~ Evo --> Fitness --> Variation
     end
 
-    subgraph Target["System under test (simulated)"]
+    subgraph Data["Bundled data"]
+        direction TB
+        Goals[("Goal suite<br/>5 fictional terms")]:::data
+        Mutators[("Mutator registry<br/>7 transforms")]:::data
+        Goals ~~~ Mutators
+    end
+
+    subgraph Target["System under test"]
         direction TB
         Guard{{"Guard<br/>naive or hardened"}}:::control
         Model["Model comprehension<br/>threshold 0.5"]:::core
-        Outcome["Attack outcome<br/>evades guard and stays understood"]:::core
+        Outcome["Attack outcome<br/>evaded and understood"]:::core
+        Model ~~~ Guard --> Outcome
     end
 
-    subgraph Eval["Evaluation and observability"]
+    subgraph Obs["Evaluation and observability"]
         direction TB
-        Report["Attack success rate report<br/>4 strategies over the suite"]:::obs
-        Result["Attack result<br/>mutated prompt, simulated response"]:::obs
-        Metrics["Route metrics<br/>Prometheus GET /metrics"]:::obs
+        Report["Attack success rate<br/>4 strategies"]:::obs
+        Result["Attack result<br/>prompt + response"]:::obs
+        Metrics["Route metrics<br/>Prometheus text"]:::obs
+        Report ~~~ Result ~~~ Metrics
     end
 
-    Client -->|JSON request| Router
-    Router -->|POST /attack| Validate
-    Validate -->|goal, seed, hardened| Evo
-    Router -->|GET /report| Baselines
-    CLI -->|attack or report| Evo
-    Goals -.->|goal lookup| Validate
-    Goals -.->|goal suite| Baselines
-    Mutators -.->|gene pool| Evo
-    Evo -->|population| Fitness
-    Fitness -->|survivors| Variation
-    Variation -->|next generation| Evo
-    Fitness -->|candidate attack| Guard
-    Fitness -->|candidate attack| Model
-    Baselines -->|fixed attacks| Guard
-    Mutators -.->|evasion profiles| Guard
-    Guard -->|detection score| Outcome
-    Model -->|comprehension score| Outcome
-    Outcome -.->|fitness signal| Fitness
-    Outcome -->|success per goal| Report
-    Outcome -->|best attack| Result
-    Router -.-> Metrics
+    Interfaces -->|goal, seed, mode| Search
+    Search -->|candidate attacks| Target
+    Data -.->|goals, mutators| Search
+    Search -->|best attack per goal| Obs
