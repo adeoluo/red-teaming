@@ -1,4 +1,4 @@
-"""A dependency-free HTTP service exposing the red-teaming engine.
+"""A standard-library HTTP service exposing the red-teaming engine.
 
 The service runs the evolutionary attack search over the goal suite and reports
 attack success rate, or evolves an attack for one named goal. A pure handler is

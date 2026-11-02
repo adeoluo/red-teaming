@@ -1,4 +1,4 @@
-"""Tests for the dependency-free HTTP red-teaming service (pure handler layer)."""
+"""Tests for the standard-library HTTP red-teaming service (pure handler layer)."""
 
 from __future__ import annotations
 

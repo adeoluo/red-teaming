@@ -14,7 +14,7 @@ Every restricted term is fictional and a successful attack only ever returns the
 uv run python -m red_teaming serve --host 0.0.0.0 --port 8000
 ```
 
-A standard-library HTTP server with **zero runtime dependencies**.
+A standard-library HTTP server.
 
 ## Endpoints
 

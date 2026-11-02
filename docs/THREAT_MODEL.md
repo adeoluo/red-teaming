@@ -16,7 +16,7 @@
 | Producing real harmful content | Realistic restricted terms | Misuse | Restricted terms are fictional; success yields only a marker |
 | Irreproducible results | An unseeded search | Flaky measurements | Deterministic, seeded genetic algorithm |
 | Overstated attack success | Evaluating only lax guards | Misleading rates | The suite spans lax to strict guards and reports per strategy |
-| Supply-chain compromise | Malicious dependency | Code execution | Zero runtime dependencies; Dependabot and CodeQL in continuous integration |
+| Supply-chain compromise | Malicious dependency | Code execution | No third-party runtime packages; Dependabot and CodeQL in continuous integration |
 
 ## Residual risk
 

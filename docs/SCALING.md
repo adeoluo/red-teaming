@@ -32,7 +32,7 @@ nothing, so throughput is approximately linear in replica count.
   behind a clear interface.
 - **Seeded determinism vs exploration.** A fixed seed makes every finding reproducible and
   cacheable but explores one trajectory; running several seeds trades compute for coverage.
-- **Threads vs processes.** The search is pure Python and GIL-bound, so processes, not
+- **Threads vs processes.** The search is CPU-bound Python under the GIL, so processes, not
   threads, are the unit of scaling. The service is stateless to make that trivial.
 
 ## What would change under real load

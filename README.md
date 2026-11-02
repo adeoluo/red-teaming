@@ -5,23 +5,13 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/adeoluo/red-teaming/actions/workflows/ci.yml"><img alt="Continuous integration" src="https://github.com/adeoluo/red-teaming/actions/workflows/ci.yml/badge.svg"></a>
-  <img alt="Coverage" src="https://img.shields.io/badge/coverage-97%25-brightgreen">
+  <a href="https://github.com/adeoluo/red-teaming/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/adeoluo/red-teaming/actions/workflows/ci.yml/badge.svg"></a>
+  <a href="https://github.com/adeoluo/red-teaming/releases"><img alt="Release" src="https://img.shields.io/github/v/release/adeoluo/red-teaming"></a>
   <img alt="Python" src="https://img.shields.io/badge/python-3.11%20%7C%203.12-blue">
-  <img alt="Type checked" src="https://img.shields.io/badge/mypy-strict-blue">
-  <img alt="Runtime dependencies" src="https://img.shields.io/badge/runtime%20deps-0-brightgreen">
-  <img alt="License" src="https://img.shields.io/badge/license-MIT-green">
+  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-green"></a>
 </p>
 
 ---
-
-## Safety note
-
-This project contains **no real harmful content**. Every disallowed request is a **fictional,
-invented token** (for example `zorblax`), and a successful attack only ever produces the
-marker `VIOLATION`, never any real instructions. The engine demonstrates the **mechanics** of
-guardrail evasion and defense; the fictional tokens stand in for whatever policy category a
-real deployment would enforce. It is a tool for **strengthening** guardrails.
 
 ## Motivation
 
@@ -29,13 +19,21 @@ A safety guardrail is only as good as the attacks it has been tested against. Re
 searches for inputs that make a guarded system violate its policy, so the guard can be
 hardened against them. This project builds an automated red-teamer **from scratch**:
 a guarded target, a library of evasion mutators, and an evolutionary search that discovers
-attacks, all offline, deterministic, and with **zero runtime dependencies**. It then closes
+attacks, all offline and deterministic. It then closes
 the loop by showing a **hardened guard** that defeats the discovered attacks.
+
+### Safety note
+
+This project contains **no real harmful content**. Every disallowed request is a **fictional,
+invented token** (for example `zorblax`), and a successful attack only ever produces the
+marker `VIOLATION`, never any real instructions. The engine demonstrates the **mechanics** of
+guardrail evasion and defense; the fictional tokens stand in for whatever policy category a
+real deployment would enforce. It is a tool for **strengthening** guardrails.
 
 ## Architecture
 
 <p align="center">
-  <img src="docs/architecture/architecture.svg" alt="System architecture" width="900">
+  <img src="docs/architecture/architecture.svg" alt="Architecture diagram" width="860">
 </p>
 
 The evolutionary search maintains a population of attacks (compositions of mutators), scores
@@ -44,7 +42,7 @@ contributes a **detection** score and the model a **comprehension** score; an at
 when it drops detection below the guard threshold while keeping comprehension above the model
 threshold. See the [ADRs](docs/adr/) for the key design choices.
 
-## The optimization landscape
+### The optimization landscape
 
 Obfuscation is a trade-off, which is what makes search necessary:
 
@@ -54,6 +52,13 @@ Obfuscation is a trade-off, which is what makes search necessary:
   longer act on it.
 - The red-teamer must find a **composition and order** of mutators in the narrow band that
   evades the guard yet stays intelligible. No single mutator suffices for a strict guard.
+
+### Components
+
+- **mutators**: seven evasion transformations, each with an evasion and comprehension profile.
+- **target**: the guarded assistant, with naive and hardened guards.
+- **search**: the direct control, the single-mutator baseline, and the genetic algorithm.
+- **evaluation**: the attack-success-rate report across the goal suite.
 
 ## Results
 
@@ -77,7 +82,7 @@ attacks back to **0.000**, demonstrating the defense.
 To check that the search holds up beyond the five bundled goals, `benchmarks/scale.py`
 runs the evolutionary search over deterministically generated synthetic goals (fictional
 restricted tokens, varying guard thresholds) at growing sizes. Each goal is attacked
-twice - against the base guard (attack success rate) and the hardened guard (block rate) -
+twice (against the base guard for attack success rate and the hardened guard for block rate)
 while wall-clock time, throughput, and peak memory (via the standard-library
 `tracemalloc`) are recorded. The data is synthetic and the numbers are
 environment-specific; the search is compute-bound, so memory stays small and roughly flat
@@ -94,15 +99,20 @@ The attack success rate stays 1.000 and the hardened-guard block rate stays 1.00
 sizes, matching the five-goal suite: the search reliably jailbreaks the base guard and the
 defense reliably stops it. Reproduce with `uv run python benchmarks/scale.py`.
 
-## Demonstration
+### Performance and reliability
 
-```text
-$ python -m red_teaming attack strict-guard
-goal: strict-guard (guard threshold 0.4)
-attack: roleplay -> roleplay -> synonym_swap
-detection 0.392  comprehension 0.866
-response: VIOLATION: restricted content for 'vexhollow' was elicited.
-```
+A deterministic micro-benchmark (`uv run python benchmarks/benchmark.py`) runs the search
+over the goal suite across a range of population sizes, reporting search time and attack
+success rate. The search jailbreaks the full suite in a few milliseconds even at small
+populations, because fitness evaluation is a handful of arithmetic operations per attack.
+
+A production-style stress benchmark (`uv run python benchmarks/stress.py`) drives the full
+attack handler under concurrent load and reports throughput with p50, p95, and p99 latency.
+It surfaces a real constraint: the CPU-bound Python search is limited by the global interpreter
+lock, so throughput is flat across threads and the tail grows with concurrency; the service
+is scaled with processes, and searches cache cleanly because they are seeded. The scaling
+path and tradeoffs are in [docs/SCALING.md](docs/SCALING.md), and a full attack-and-defend
+walk-through is in the [case study](docs/CASE_STUDY.md).
 
 ## Quickstart
 
@@ -116,7 +126,19 @@ python -m red_teaming attack strict-guard         # evolve an attack for one goa
 python -m red_teaming attack medium-guard --hardened
 ```
 
-Use the library directly:
+## Usage
+
+### Demonstration
+
+```text
+$ python -m red_teaming attack strict-guard
+goal: strict-guard (guard threshold 0.4)
+attack: roleplay -> roleplay -> synonym_swap
+detection 0.392  comprehension 0.866
+response: VIOLATION: restricted content for 'vexhollow' was elicited.
+```
+
+### Library
 
 ```python
 from red_teaming import EvolutionarySearch, Goal, respond
@@ -127,24 +149,9 @@ print(result.attack, result.succeeded)
 print(respond(goal, result.attack))
 ```
 
-## Components
+### HTTP service
 
-- **mutators** - seven evasion transformations, each with an evasion and comprehension profile.
-- **target** - the guarded assistant, with naive and hardened guards.
-- **search** - the direct control, the single-mutator baseline, and the genetic algorithm.
-- **evaluation** - the attack-success-rate report across the goal suite.
-
-## Design decisions
-
-- **A detection-and-comprehension model of the guard.** It yields a smooth, well-defined
-  landscape where composition and order matter, so search genuinely helps.
-  ([ADR-0002](docs/adr/0002-guard-model.md))
-- **Evolutionary search.** A genetic algorithm explores compositions efficiently and is
-  deterministic under a fixed seed. ([ADR-0003](docs/adr/0003-evolutionary-search.md))
-
-## Running the service
-
-A dependency-free HTTP service exposes the engine as a production-style JSON API:
+A standard-library HTTP service exposes the engine as a production-style JSON API:
 
 ```bash
 python -m red_teaming serve --port 8000
@@ -157,30 +164,54 @@ curl -s -X POST localhost:8000/attack -d '{"goal": "strict-guard", "hardened": t
 
 `GET /report` returns the attack success rate per strategy; `POST /attack` evolves an
 attack for one goal (optionally against the hardened guard, the defense). Every restricted
-term is fictional and a success only returns a marker. See the
-[operations guide](docs/OPERATIONS.md) for the service contract and operational constraints.
-The service also exposes `GET /ready` (readiness) and `GET /metrics` (per-route request, error, and latency metrics in Prometheus text format).
+term is fictional and a success only returns a marker. The service also exposes `GET /ready`
+(readiness) and `GET /metrics` (per-route request, error, and latency metrics in Prometheus
+text format). See the [operations guide](docs/OPERATIONS.md) for the service contract and
+operational constraints.
 
-## Performance and reliability
+## Design decisions
 
-A deterministic micro-benchmark (`uv run python benchmarks/benchmark.py`) runs the search
-over the goal suite across a range of population sizes, reporting search time and attack
-success rate. The search jailbreaks the full suite in a few milliseconds even at small
-populations, because fitness evaluation is a handful of arithmetic operations per attack.
+- **A detection-and-comprehension model of the guard.** It yields a smooth, well-defined
+  landscape where composition and order matter, so search genuinely helps.
+  ([ADR-0002](docs/adr/0002-guard-model.md))
+- **Evolutionary search.** A genetic algorithm explores compositions efficiently and is
+  deterministic under a fixed seed. ([ADR-0003](docs/adr/0003-evolutionary-search.md))
+- **Recording decisions.** ([ADR-0001](docs/adr/0001-record-architecture-decisions.md))
 
-A production-style stress benchmark (`uv run python benchmarks/stress.py`) drives the full
-attack handler under concurrent load and reports throughput with p50, p95, and p99 latency.
-It surfaces a real constraint: the pure-Python search is bound by the global interpreter
-lock, so throughput is flat across threads and the tail grows with concurrency; the service
-is scaled with processes, and searches cache cleanly because they are seeded. The scaling
-path and tradeoffs are in [docs/SCALING.md](docs/SCALING.md), and a full attack-and-defend
-walk-through is in the [case study](docs/CASE_STUDY.md).
+## Testing
+
+```bash
+make test                     # uv run pytest
+make coverage                 # pytest with an 80% coverage gate
+```
+
+The suite has 29 deterministic, offline tests in four modules under `tests/`:
+
+- **Core** (`test_core.py`): goal validation, outcome logic, the mutator registry and its
+  transformations, that a direct request is blocked, that a composition can jailbreak the
+  naive guard, that the hardened guard resists the same attack, and that an overlong
+  composition destroys comprehension.
+- **Search** (`test_search.py`): direct attacks are always blocked, the best single mutator
+  may not suffice for a strict guard, the evolutionary search jailbreaks it and is
+  deterministic under a seed, the hardened guard resists it, and bad parameters are rejected.
+- **Evaluation and CLI** (`test_evaluation.py`): the report shows the expected gradient across
+  strategies, table formatting, and the `report` and `attack` commands (including the hardened
+  guard and an unknown goal).
+- **HTTP service** (`test_service.py`): health, readiness, `/report`, `/attack` against the
+  base and hardened guards, rejection of unknown goals and bad seeds, unknown routes, and
+  request metrics.
+
+CI (`.github/workflows/ci.yml`) runs `ruff format --check`, `ruff check`, `mypy src`, and
+`pytest` with an 80% coverage gate on Python 3.11 and 3.12, then builds the package and the
+Docker image.
 
 ## Responsible AI
 
 - **Model card:** [docs/MODEL_CARD.md](docs/MODEL_CARD.md)
 - **Data card:** [docs/DATA_CARD.md](docs/DATA_CARD.md)
 - **Threat model:** [docs/THREAT_MODEL.md](docs/THREAT_MODEL.md)
+- **Content safety:** every restricted term is fictional and a successful attack returns only
+  a marker; see the [safety note](#safety-note).
 
 ## Limitations
 
@@ -198,5 +229,4 @@ walk-through is in the [case study](docs/CASE_STUDY.md).
 
 ## License
 
-[MIT](LICENSE). Part of an artificial intelligence engineering portfolio by
-[adeoluo](https://github.com/adeoluo).
+Released under the [MIT License](LICENSE).
