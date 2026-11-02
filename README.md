@@ -180,6 +180,16 @@ term is fictional and a success only returns a marker. The service also exposes 
 text format). See the [operations guide](docs/OPERATIONS.md) for the service contract and
 operational constraints.
 
+### Demos
+
+Recorded from real runs with [vhs](https://github.com/charmbracelet/vhs); each tape is in `docs/demo/`.
+
+Attack success rates against each guard.
+
+<p align="center">
+  <img src="docs/demo/report.gif" alt="Attack success rates against each guard" width="860">
+</p>
+
 ## Design decisions
 
 - **A detection-and-comprehension model of the guard.** It yields a smooth, well-defined
