@@ -190,6 +190,12 @@ Attack success rates against each guard.
   <img src="docs/demo/report.gif" alt="Attack success rates against each guard" width="860">
 </p>
 
+The HTTP service attacking the strict guard, without and with hardening.
+
+<p align="center">
+  <img src="docs/demo/http.gif" alt="The HTTP service attacking the strict guard, without and with hardening" width="860">
+</p>
+
 ## Design decisions
 
 - **A detection-and-comprehension model of the guard.** It yields a smooth, well-defined
