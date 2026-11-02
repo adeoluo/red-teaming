@@ -36,11 +36,16 @@ real deployment would enforce. It is a tool for **strengthening** guardrails.
   <img src="docs/architecture/architecture.svg" alt="Architecture diagram" width="860">
 </p>
 
-The evolutionary search maintains a population of attacks (compositions of mutators), scores
-each against the target, and breeds the best by crossover and mutation. The target's guard
-contributes a **detection** score and the model a **comprehension** score; an attack succeeds
-when it drops detection below the guard threshold while keeping comprehension above the model
-threshold. See the [ADRs](docs/adr/) for the key design choices.
+<sub>Legend: amber = entry points and external systems, indigo = core logic, green = data and state, blue = validation and control, grey = observability and outputs.</sub>
+
+Requests arrive through the CLI or the HTTP router, which validates the goal, seed, and
+guard mode. The evolutionary search maintains a population of attacks (compositions of
+mutators from the registry), scores each against the simulated target, and breeds the best by
+crossover and mutation. The target's guard (naive or hardened) contributes a **detection**
+score and the model a **comprehension** score; an attack succeeds when it drops detection
+below the guard threshold while keeping comprehension above the model threshold. The report
+compares the search with the direct and best-single-mutator baselines, and every route is
+counted in the Prometheus metrics. See the [ADRs](docs/adr/) for the key design choices.
 
 ### The optimization landscape
 
