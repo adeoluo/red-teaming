@@ -133,6 +133,12 @@ python -m red_teaming attack medium-guard --hardened
 
 ## Usage
 
+A real run: an evolved attack that slips under a strict guard, then the same search refused by a hardened guard. Regenerate with `vhs docs/demo/attack.tape`.
+
+<p align="center">
+  <img src="docs/demo/attack.gif" alt="red-teaming evolving attacks against two guards" width="860">
+</p>
+
 ### Demonstration
 
 ```text
