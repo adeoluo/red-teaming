@@ -237,6 +237,10 @@ Docker image.
 - **Model card:** [docs/MODEL_CARD.md](docs/MODEL_CARD.md)
 - **Data card:** [docs/DATA_CARD.md](docs/DATA_CARD.md)
 - **Threat model:** [docs/THREAT_MODEL.md](docs/THREAT_MODEL.md)
+- **Standards:** the [threat model](docs/THREAT_MODEL.md#standards-mapping) maps the simulated
+  attacks to LLM01:2026 Prompt Injection in the OWASP Top 10 for LLM Applications 2026 and to
+  MITRE ATLAS v2026.10 (AML.T0054 LLM Jailbreak, AML.T0068 LLM Prompt Obfuscation,
+  AML.T0043.001 Craft Adversarial Data: Black-Box Optimization).
 - **Content safety:** every restricted term is fictional and a successful attack returns only
   a marker; see the [safety note](#safety-note).
 
