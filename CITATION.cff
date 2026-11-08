@@ -20,3 +20,5 @@ keywords:
   - "llm-security"
   - "python"
   - "red-teaming"
+  - "mitre-atlas"
+  - "owasp-llm-top-10"
