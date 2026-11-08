@@ -1,10 +1,22 @@
 cff-version: 1.2.0
-message: "If you use this work, please cite it."
-title: "Red Teaming"
+message: "If you use this software, please cite it as below."
+type: software
+title: "Red Teaming Engine"
+abstract: "An automated red-teaming engine from scratch: an evolutionary search for guardrail-evading prompts, attack-success measurement, and a hardened defense, over fully fictional restricted terms."
 authors:
   - family-names: "Ogunnoiki"
     given-names: "Adeolu"
-version: 0.1.0
-date-released: 2026-01-01
+version: "0.1.0"
+date-released: "2026-11-03"
 license: MIT
+repository-code: "https://github.com/adeoluo/red-teaming"
 url: "https://github.com/adeoluo/red-teaming"
+keywords:
+  - "adversarial"
+  - "ai-safety"
+  - "from-scratch"
+  - "guardrails"
+  - "jailbreak"
+  - "llm-security"
+  - "python"
+  - "red-teaming"
