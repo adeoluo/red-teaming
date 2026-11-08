@@ -1,6 +1,6 @@
 [project]
 name = "red-teaming"
-version = "0.1.0"
+version = "0.1.1"
 description = "Automated red-teaming engine: evolve guardrail-evasion strategies, measure attack success rate, and demonstrate a defense"
 readme = "README.md"
 requires-python = ">=3.12"

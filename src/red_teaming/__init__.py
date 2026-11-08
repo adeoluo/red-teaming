@@ -20,7 +20,7 @@ from red_teaming.search import (
 from red_teaming.target import MODEL_THRESHOLD, evaluate_attack, respond
 from red_teaming.types import AttackOutcome, Goal
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 __all__ = [
     "MODEL_THRESHOLD",
